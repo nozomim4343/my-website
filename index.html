@@ -38,59 +38,103 @@ code{display:block;word-break:break-all;background:var(--card);border:2px dashed
 <div id="app"></div>
 </div>
 <script>
-// axes: 0=インドア(+)/アウトドア(-) 1=モノ(+)/体験(-) 2=実用(+)/ときめき(-) 3=日常UP(+)/非日常(-)
 var V=[2,0,-2];
-var Q1=[
-[0,"理想の休日は？","家でごろごろ・まったり","どっちも好き","とにかく外に出たい"],
-[0,"友達と遊ぶなら？","家飲み・ゲーム","その時の気分","お出かけ・アクティブ"],
-[1,"誕生日で記憶に残るのは？","形に残るもの","どっちも","体験・思い出"],
-[1,"旅行先でテンション上がるのは？","お土産・買い物","半々","景色やご当地体験"],
-[2,"買い物で重視するのは？","使いやすさ・機能","バランス","見た目・ワクワク感"],
-[2,"グッとくるのは？","地味に役立つもの","どっちも","持ってるだけで上がるもの"],
-[3,"自分で買うなら？","毎日使うものは良いものを","特にこだわらない","贅沢品はたまにご褒美で"],
-[3,"もらって嬉しいのは？","普段の生活が快適になる","どっちも","非日常のご褒美感"]];
-var SH=[
-["お酒を飲むのは？","家でゆっくり","外で・誰かと","どっちも"],
-["サプライズ度は？","欲しいもの確実がいい","予想外でうれしい","どっちでも"],
-["見た目の好みは？","シンプル・ミニマル","遊び心・個性","高級感・渋め"],
-["消えもの（食・体験）は？","全然OK","残るものがいい","どっちも好き"]];
+// [id, axis(-1=なし), 質問, 選択肢1, 2, 3]  axis: 0=インドア 1=モノ 2=実用 3=日常UP
+var Q=[
+["A1",0,"理想の休日は？","家でごろごろ・まったり","どっちも好き","とにかく外に出たい"],
+["A2",0,"友達と遊ぶなら？","家飲み・ゲーム","その時の気分","お出かけ・アクティブ"],
+["A4",1,"旅行先でテンション上がるのは？","お土産・買い物","半々","景色やご当地体験"],
+["A5",2,"買い物で重視するのは？","使いやすさ・機能","バランス","見た目・ワクワク感"],
+["A6",2,"グッとくるのは？","地味に役立つもの","どっちも","持ってるだけで上がるもの"],
+["A7",3,"自分で買うなら？","毎日使うものは良いものを","特にこだわらない","贅沢品はたまにご褒美で"],
+["A8",3,"もらって嬉しいのは？","普段の生活が快適になる","どっちも","非日常のご褒美感"],
+["A3",1,"ボーナスが出たら？","ほしいものを買う","どっちも","旅行やおいしいものに使う"],
+["D1",-1,"日常生活でお金をかけても改善したいのは？","面倒な作業や手間","家で過ごす時間の快適さ","外出や移動の快適さ"],
+["B2",-1,"サプライズ度は？","欲しいもの確実がいい","予想外でうれしい","どっちでも"],
+["B3",-1,"見た目の好みは？","シンプル・ミニマル","遊び心・個性","高級感・渋め"],
+["B4",-1,"消えもの（食・体験）は？","全然OK","残るものがいい","どっちも好き"],
+["C1",-1,"プレゼントの使い方は？","毎日使い倒したい","時々の特別な日に","飾る・眺める"],
+["C4",-1,"わたしにもらって嬉しいのは？","自分では絶対選ばなさそうなもの","さりげなく実用的なもの","センスを感じるもの"],
+["G2",-1,"もらったものを使うなら？","家","出かけたとき","仕事"],
+["G4",-1,"新しいものは？","すぐ試す","評判を見てから","今あるもので十分"],
+["G7",-1,"家の音まわりは？","スピーカーがある","ない","ヘッドホン派"],
+["F2",-1,"気になる持ち物は？","時計","財布・カバン","香り・アクセ"],
+["F3",-1,"小物系でもらうなら？","黒・ネイビー系","グレー・茶系","明るい色もOK"],
+["F4",-1,"ブランドは？","こだわり強い","ちょっと気にする","全然気にしない"],
+["F5",-1,"財布は？","新しくしたい","まだ使える","こだわりがある"],
+["F6",-1,"腕時計は？","持ってない","いくつか持ってる","つけない"],
+["F7",-1,"香りは？","好き","つけない","苦手"],
+["F8",-1,"カバンは？","新しくしたい","まだ使える","こだわりがある"],
+["E3",-1,"ごちそう食べるなら？","外食","作ってもらう","自分で作るのも好き"],
+["E4",-1,"食の冒険は？","珍しいもの好き","定番が好き","特にこだわりなし"],
+["D2",-1,"外食をするなら？","普段よりぜいたくな食事","珍しい料理や初めてのお店","景色や雰囲気も楽しめるお店"],
+["X1",-1,"わたしと行くなら？","旅行・温泉","ライブ・観戦","アクティビティ"],
+["X3",-1,"ペースは？","のんびり","アクティブ","気分で"],
+["X4",-1,"初めての体験は？","やってみたい","どっちでも","慣れた方が安心"],
+["X6",-1,"サプライズは？","大好き","照れる","苦手"],
+["X8",-1,"季節は？","暑い時期が好き","寒い時期が好き","いつでも"],
+["R1",-1,"疲れた時は？","お風呂・マッサージ","とにかく寝る","好きなものを食べる"],
+["R2",-1,"睡眠は？","こだわる","ふつう","浅い方"],
+["R4",-1,"癒されるのは？","香りや音","手触り","景色・間接照明"],
+["R6",-1,"肩こりや疲れは？","よくある","たまに","ない"],
+["R7",-1,"寝る前は？","スマホを見がち","本・音楽","すぐ寝る"]];
+var N=Q.length,PS=8,NP=Math.ceil(N/PS);
+// ideas: [text, score(a)=0なら除外/大きいほど優先, 1=消えもの]
 var G=[
-{n:"ガジェット探検家",e:"🎧",v:[1,1,1,1],c:"新しい便利、見つけたら試したい！",i:[["ワイヤレスイヤホン上位モデル（AirPods Pro / Sony WF-1000XM系）",function(a){return a[6]==2?0:1}],["スマートウォッチ（iPhoneならApple Watch、AndroidならGalaxy / Garmin）"],["高音質ポータブルスピーカー（Bose / Marshall）",function(a){return a[6]==2?0:1}],["通勤が快適になる高品質モバイルバッテリー＆ポーチ",function(a){return a[5]==0?2:0}],["上質なワイヤレスキーボード・マウス（Logicool）",function(a){return a[5]==2?2:0}],["スマホまわりの上質アクセサリー（ケース・スタンド）"]],
-q:[["Apple製品は？","Apple派","Android・こだわらない","メーカーの好みあり"],["よく使う場面は？","通勤・移動中","家で","仕事・勉強"],["音楽や動画は？","よく聴く・観る","たまに","あんまり"],["新しいものは？","すぐ試す","評判を見てから","今あるもので十分"]]},
-{n:"おしゃれ小物マスター",e:"⌚",v:[-1,1,-1,-1],c:"身につけるもので気分を上げたい！",i:[["きれいめ腕時計（Daniel Wellington / SEIKO）",function(a){return a[5]==0?2:1}],["上質な革財布・名刺入れ・キーケース",function(a){return a[5]==1?2:1}],["フレグランス（ジョーマローン等）",function(a){return a[5]==2?2:1}],["シンプルなアクセサリー（ブレスレット・リング）"]],
-q:[["普段の服は？","きれいめ","カジュアル・ストリート","決まってない"],["気になる持ち物は？","時計","財布・カバン","香り・アクセ"],["好きな色は？","黒・グレー系","茶・ネイビー系","明るい色もOK"],["ブランドは？","こだわり強い","ちょっと気にする","全然気にしない"]]},
-{n:"グルメ＆お酒の達人",e:"🍷",v:[1,-1,-1,-1],c:"おいしい時間こそ最高のぜいたく！",i:[["クラフトビール・ウイスキーの飲み比べセット",function(a){return a[0]==0?2:1},1],["高級和牛などお取り寄せ肉グルメ",function(a){return a[5]==0?2:1},1],["うなぎ・海鮮のお取り寄せ",function(a){return a[5]==1?2:1},1],["高級スイーツ・チョコの詰め合わせ",function(a){return a[5]==2?2:1},1],["おつまみ・チーズの詰め合わせ",function(a){return a[0]==0?2:1},1],["人気レストランのペアディナー券",function(a){return a[6]==1||a[0]==1?2:1}],["本格スパイス・調理器具セット",function(a){return a[6]==2?2:0}],["ちょっといいグラス・ペアのお皿セット",function(a){return a[3]==1?2:0}]],
-q:[["おやつは？","甘党","しょっぱい派","食べない"],["好きな味は？","肉・がっつり","魚・和","甘いもの"],["食べるのは？","家でゆっくり","外食で","作るのも好き"],["食の冒険は？","珍しいもの好き","定番が好き","特にこだわりなし"]]},
-{n:"思い出コレクター",e:"🎢",v:[-1,-1,-1,-1],c:"モノより一緒に過ごす時間が宝物！",i:[["温泉旅館・記念日向け宿泊ギフト",function(a){return a[4]==0?2:1}],["ライブ・スポーツ観戦チケット",function(a){return a[4]==1?2:0}],["ふたりでキャンプ・撮影旅行（コテージ・グランピング）"],["ふたりで体験（気球・クルーズ・ディナー）",function(a){return a[4]==2?2:1}]],
-q:[["誘われたいのは？","旅行・温泉","ライブ・観戦","食事・アクティビティ"],["日程は？","近場で気軽に","泊まりでしっかり","日帰り"],["ペースは？","のんびり","アクティブ","気分で"],["初めての体験は？","やってみたい","どっちでも","慣れた方が安心"]]},
-{n:"好きを満喫するキャンプ＆カメラ人",e:"🏕️",v:[-1,1,1,1],c:"道具は揃ってる。だから“楽しみ方”をもっと広げたい！",i:[["撮りためた写真のフォトブック・大判プリント＆フレーム",function(a){return a[5]==1||a[6]==1?2:1}],["キャンプ場で使える宿泊・利用ギフト券",function(a){return a[6]==2?2:1}],["キャンプ飯がレベルアップする高級食材・スパイス・コーヒーのセット",function(a){return a[6]==0||a[4]==0?2:1},1],["写真講座・撮影ワークショップのチケット",function(a){return a[5]==0?2:0}],["絶景スポットの宿泊＆撮影旅行",function(a){return a[4]==1?2:0}]],
-q:[["キャンプで楽しみなのは？","焚き火・ごはん","景色・のんびり","仲間とわいわい"],["写真は？","撮るのが好き","撮って飾る・まとめたい","人に見せたい"],["もらって嬉しい趣味ギフトは？","食材など消えもの","形に残るもの","宿泊・場所のチケット"],["誰と楽しむ？","ひとりで","友達と","わたしと"]]},
-{n:"のんびり快適マイスター",e:"🛋️",v:[1,1,1,-1],c:"おうちを極上の居心地にしたい！",i:[["上質なパジャマ・ルームウェア",function(a){return a[7]==1?2:1}],["マッサージガン・ヘッドスパ家電",function(a){return a[4]==0?2:1}],["コーヒーメーカー・お気に入りのチェア"],["高品質な枕・寝具",function(a){return a[5]!=1&&a[5]!=9?2:0}],["アロマディフューザー・上質なキャンドル",function(a){return a[7]==0?2:0},1],["間接照明（おしゃれなランプ）",function(a){return a[7]==2?2:0}],["ちょっといい入浴剤＆バスグッズ",function(a){return a[4]==0?2:0},1]],
-q:[["疲れた時は？","お風呂・マッサージ","とにかく寝る","好きなものを食べる"],["睡眠は？","こだわる","ふつう","浅い方"],["部屋は？","整頓ミニマル","好きなものに囲まれる","気にしてない"],["癒されるのは？","香りや音","手触り","景色・間接照明"]]}];
-var app=document.getElementById("app"),A1=[],A2=[],GI=0;
-function sc(a){var s=[0,0,0,0];Q1.forEach(function(q,i){s[q[0]]+=V[a[i]]});return s}
-function rank(a){var s=sc(a);return G.map(function(g,i){return[i,g.v.reduce(function(t,x,k){return t+x*s[k]},0)]}).sort(function(x,y){return y[1]-x[1]})}
-function form(qs,off,title,lead,btn,done){
- var h='<h1>'+title+'</h1><p class="c sub">'+lead+'</p><div id="bar"><i></i></div>';
- qs.forEach(function(q,i){var s=q.length>4?1:0;
-  h+='<div class="q"><h2><span>Q'+(i+1+off)+'</span>'+q[s]+'</h2>';
-  for(var k=0;k<3;k++)h+='<label><input type="radio" name="q'+i+'" value="'+k+'">'+q[s+1+k]+'</label>';
-  h+='</div>'});
- h+='<button id="go">'+btn+'</button><p id="warn" class="c sub"></p>';
+{n:"ガジェット探検家",e:"🎧",v:[1,1,1,1],c:"新しい便利、見つけたら試したい！",i:[
+["Mac・iPhoneまわりのガジェット（アルミスタンド・USBハブ・ワイヤレスキーボード/マウス、1〜2万円）",function(a){return a.G2==2||a.D1==0?2:1}],
+["MagSafe対応モバイルバッテリー＆充電スタンド（〜1万円）",function(a){return a.G2==1||a.D1==2?2:1}],
+["ポータブルスピーカー（Bose・Marshallなど、2〜3万円）",function(a){return a.G7==0?0:a.G7==1?2:1}],
+["ノイズキャンセリングヘッドホン（Sony・Boseの型落ち上位機、2〜3万円台）",function(a){return a.G7==2||a.D1==2?2:1}],
+["上質なレザーケース・ポーチ（スマホ・Mac用、〜2万円）"]]},
+{n:"おしゃれ小物マスター",e:"⌚",v:[-1,1,-1,-1],c:"身につけるもので気分を上げたい！",i:[
+["きれいめ腕時計（SEIKO・Citizenなど、2〜3万円）",function(a){return a.F6==2?0:a.F2==0||a.F6==0?2:1}],
+["上質な革財布（土屋鞄・Dakotaなど、2〜3万円）",function(a){return a.F5==0||a.F2==1?2:1}],
+["上質なレザーバッグ（ボディバッグ・ショルダー、2〜3万円）",function(a){return a.F8==0||a.F2==1||a.D1==2?2:1}],
+["フレグランス（ジョーマローン等、1〜2万円台）",function(a){return a.F7!=0?0:a.F2==2?2:1},1],
+["上質なカードケース＆キーケース（〜2万円）"]]},
+{n:"グルメ＆お酒の達人",e:"🍷",v:[1,-1,-1,-1],c:"おいしい時間こそ最高のぜいたく！",i:[
+["高級和牛のお取り寄せ（A5ステーキ・すき焼きなど、1〜3万円）",function(a){return a.D2==0?3:2},1],
+["うなぎ・海鮮のお取り寄せ（1〜2万円）",null,1],
+["高級スイーツ・チョコの詰め合わせ（〜1万円）",null,1],
+["人気レストランのペアディナー券（2〜3万円）",function(a){return a.E3==0||a.D2>0?2:1}],
+["自宅で楽しむお取り寄せごちそうコース（2〜3万円）",function(a){return a.E3==1?2:1},1],
+["本格スパイス・調理器具セット（1〜2万円）",function(a){return a.E3==2?2:0}],
+["ちょっといいグラス・ペアのお皿セット（〜2万円）",function(a){return a.B4==1?2:0}]]},
+{n:"思い出コレクター",e:"🎢",v:[-1,-1,-1,-1],c:"モノより一緒に過ごす時間が宝物！",i:[
+["温泉旅館・記念日向け宿泊ギフト（ペア1泊、2〜3万円）",function(a){return a.X1==0?2:1}],
+["ライブ・スポーツ観戦のペアチケット（1〜3万円）",function(a){return a.X1==1?2:0}],
+["ふたりで体験ギフト（気球・クルーズ・ディナー、2〜3万円）",function(a){return a.X1==2||a.D2==2?2:a.X4==2?0:1}],
+["ふたりで絶景ドライブ＆宿泊（〜3万円）",function(a){return a.D2==2?2:1}],
+["日帰り温泉・スパのペアチケット（〜1万円）"]]},
+{n:"のんびり快適マイスター",e:"🛋️",v:[1,1,1,-1],c:"おうちを極上の居心地にしたい！",i:[
+["上質なパジャマ・ルームウェア（〜2万円）",function(a){return a.R4==1||a.D1==1?2:1}],
+["マッサージガン（Theragunなど、2〜3万円）",function(a){return a.R1==0||a.R6==0||a.D1==1?2:1}],
+["高品質な枕・寝具（1〜3万円）",function(a){return a.R2==1?0:2}],
+["アロマディフューザー・上質なキャンドル（〜1万円）",function(a){return a.R4==0?2:0},1],
+["間接照明（おしゃれなランプ、〜2万円）",function(a){return a.R4==2?2:0}],
+["ちょっといい入浴剤＆バスグッズ（〜1万円）",function(a){return a.R1==0?1:0},1],
+["上質なタオル・ルームシューズのセット（〜1万円）"]]}];
+var app=document.getElementById("app"),AN=[];
+function toObj(d){var o={};Q.forEach(function(q,i){o[q[0]]=+d[i]});return o}
+function rank(a){var s=[0,0,0,0];Q.forEach(function(q){if(q[1]>=0)s[q[1]]+=V[a[q[0]]]});
+ return G.map(function(g,i){return[i,g.v.reduce(function(t,x,k){return t+x*s[k]},0)]}).sort(function(x,y){return y[1]-x[1]})}
+function pick(g,a,n){return g.i.map(function(x,j){var s=x[1]?x[1](a):1;if(x[2]&&a.B4==1)s=0;return[x[0],s,j]}).filter(function(x){return x[1]>0}).sort(function(p,q){return q[1]-p[1]||p[2]-q[2]}).slice(0,n).map(function(x){return"<li>"+x[0]+"</li>"}).join("")}
+function page(p){var qs=Q.slice(p*PS,p*PS+PS);
+ var h='<h1>🎁 プレゼント診断</h1><p class="c sub">'+(p==0?'直感でポチポチ答えてね！':'その調子！')+'（'+(p+1)+' / '+NP+'ページ）</p><div id="bar"><i></i></div>';
+ qs.forEach(function(q,i){h+='<div class="q"><h2><span>Q'+(p*PS+i+1)+'</span>'+q[2]+'</h2>';
+  for(var k=0;k<3;k++)h+='<label><input type="radio" name="q'+i+'" value="'+k+'">'+q[3+k]+'</label>';h+='</div>'});
+ h+='<button id="go">'+(p<NP-1?'つぎへ ➡️':'回答を完了する 🎉')+'</button><p id="warn" class="c sub"></p>';
  app.innerHTML=h;window.scrollTo(0,0);
  function upd(){var n=app.querySelectorAll("input:checked").length;app.querySelector("#bar i").style.width=(n/qs.length*100)+"%";return n}
  app.onchange=upd;
  document.getElementById("go").onclick=function(){
   if(upd()<qs.length){document.getElementById("warn").textContent="まだ答えてない質問があるよ！";return}
-  done(qs.map(function(q,i){return+app.querySelector('input[name="q'+i+'"]:checked').value}))}}
-function stage1(){form(Q1,0,"🎁 プレゼント診断","直感でポチポチ答えてね！まずは8問","つぎへ ➡️",function(a){A1=a;GI=rank(a)[0][0];mid()})}
-function mid(){app.onchange=null;app.innerHTML='<div class="c"><div class="em">🔍</div><h1>前半おつかれさま！</h1><p>ここからは深掘りタイム。<br>あと8問だけ答えてね</p><button id="nx">深掘りスタート ✨</button></div>';
- document.getElementById("nx").onclick=stage2}
-function stage2(){form(SH.concat(G[GI].q),8,"🔍 深掘りタイム","もうちょっとだけ！ラスト8問","回答を完了する 🎉",function(a){A2=a;thanks()})}
-function code(){return A1.concat(A2).join("")}
+  qs.forEach(function(q,i){AN[p*PS+i]=+app.querySelector('input[name="q'+i+'"]:checked').value});
+  if(p<NP-1)page(p+1);else thanks()}}
 function thanks(){app.onchange=null;
- var t="🎁誕生日診断の回答コードだよ→ "+code();
- app.innerHTML='<div class="c"><div class="em">🎉</div><h1>回答ありがとう〜！</h1><p>おかげでいい感じに決まりそう！<br>結果は当日までないしょだよ〜🤫</p><div class="box c">最後に、このボタンでわたしに回答を送ってね👇<button id="sh">💌 回答を送る</button><p id="msg" class="sub"></p></div></div>';
+ var t="🎁誕生日診断の回答コードだよ→ "+AN.join("");
+ app.innerHTML='<div class="c"><div class="em">🎉</div><h1>回答ありがとう〜！</h1><p>結果は当日までないしょだよ〜🤫</p><div class="box c">最後に、このボタンでわたしに回答を送ってね👇<button id="sh">💌 回答を送る</button><p id="msg" class="sub"></p></div></div>';
  document.getElementById("sh").onclick=function(){
   var m=document.getElementById("msg");
   if(navigator.share){navigator.share({text:t}).catch(function(){})}
@@ -99,16 +143,16 @@ function thanks(){app.onchange=null;
 function her(){app.onchange=null;
  app.innerHTML='<h1>🕵️ 結果ルーム（わたし用）</h1><p class="c sub">届いたコードを貼ってね</p><textarea id="cd" placeholder="回答コードを貼り付け"></textarea><button id="ok">結果を見る 🔓</button><p id="er" class="c sub"></p><div id="out"></div>';
  document.getElementById("ok").onclick=function(){
-  var d=(document.getElementById("cd").value.match(/\d{16}/)||[""])[0];
-  if(!d){document.getElementById("er").textContent="16桁のコードが見つからないよ";return}
-  var a=d.split("").map(Number),a1=a.slice(0,8),a2=a.slice(8),r=rank(a1),t=G[r[0][0]],u=G[r[1][0]],qs=SH.concat(t.q);
-  var ans1=Q1.map(function(q,i){return"<li><span class='sub'>"+q[1]+"</span><br><b>"+q[2+a1[i]]+"</b></li>"}).join("");var ans=qs.map(function(q,i){var s=q.length>4?1:0;return"<li><span class='sub'>"+q[s]+"</span><br><b>"+q[s+1+a2[i]]+"</b></li>"}).join("");
+  var d=(document.getElementById("cd").value.match(new RegExp("\\d{"+N+"}"))||[""])[0];
+  if(!d){document.getElementById("er").textContent=N+"桁のコードが見つからないよ";return}
+  var a=toObj(d),r=rank(a),t=G[r[0][0]],u=G[r[1][0]];
+  var more=r.slice(2,4).map(function(x){var g=G[x[0]];return"<b>"+g.e+" "+g.n+"</b><ul>"+pick(g,a,2)+"</ul>"}).join("");
+  var boxes="";for(var p=0;p<NP;p++){boxes+='<div class="box"><b>📝 回答 '+(p+1)+'/'+NP+'</b><ul>'+Q.slice(p*PS,p*PS+PS).map(function(q,i){return"<li><span class='sub'>"+q[2]+"</span><br><b>"+q[3+(+d[p*PS+i])]+"</b></li>"}).join("")+'</ul></div>'}
   document.getElementById("out").innerHTML='<div class="c"><div class="em">'+t.e+'</div><div class="sub">彼のジャンルは…</div><h1>'+t.n+'</h1><p>'+t.c+'</p></div>'
-  +'<div class="box"><b>💡 プレゼントアイデア</b><ul>'+pick(t,a2,3)+'</ul></div>'
-  +'<div class="box"><b>📝 前半8問の回答</b><ul>'+ans1+'</ul></div><div class="box"><b>📝 深掘り8問の回答</b><ul>'+ans+'</ul></div>'
-  +'<div class="box"><b>🥈 サブ候補：'+u.e+' '+u.n+'</b><ul>'+pick(u,a2,2,1)+'</ul></div>'}}
-function pick(g,a2,n,sub){var a=sub?a2.slice(0,4).concat([9,9,9,9]):a2;return g.i.map(function(x,j){var s=x[1]?x[1](a):1;if(x[2]&&a[3]==1)s=0;return[x[0],s,j]}).filter(function(x){return x[1]>0}).sort(function(p,q){return q[1]-p[1]||p[2]-q[2]}).slice(0,n).map(function(x){return"<li>"+x[0]+"</li>"}).join("")}
-function route(){if(location.hash==="#her")her();else stage1()}
+  +'<div class="box"><b>💡 プレゼントアイデア</b><ul>'+pick(t,a,3)+'</ul></div>'
+  +'<div class="box"><b>🥈 サブ候補：'+u.e+' '+u.n+'</b><ul>'+pick(u,a,2)+'</ul></div>'
+  +'<div class="box"><b>🥉 そのほかの候補</b><br>'+more+'</div>'+boxes}}
+function route(){if(location.hash==="#her")her();else page(0)}
 window.addEventListener("hashchange",route);route();
 </script>
 </body>
