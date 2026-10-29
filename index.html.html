@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>🎁 誕生日プレゼント診断</title>
+<style>
+:root{--bg:#fff7ec;--card:#fff;--tx:#33291f;--sub:#7a6a58;--ac:#ff6b4a;--ac2:#ffd23f;--bd:#f0dcc2;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#231b14;--card:#322819;--tx:#fbefdc;--sub:#c4b196;--bd:#4d3d28}}
+:root[data-theme="dark"]{--bg:#231b14;--card:#322819;--tx:#fbefdc;--sub:#c4b196;--bd:#4d3d28}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.6}
+.w{max-width:520px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:24px;text-align:center;margin:8px 0}
+.c{text-align:center}
+.sub{font-size:13px;color:var(--sub)}
+.q{background:var(--card);border:2px solid var(--bd);border-radius:18px;padding:14px;margin-bottom:14px}
+.q h2{font-size:15px;margin:0 0 10px}
+.q h2 span{display:inline-block;background:var(--ac);color:#fff;border-radius:99px;padding:0 9px;margin-right:6px;font-size:13px}
+label{display:block;border:2px solid var(--bd);border-radius:12px;padding:10px 12px;margin-top:8px;cursor:pointer;font-size:14px}
+label:has(input:checked){border-color:var(--ac);background:rgba(255,107,74,.12);font-weight:700}
+input[type=radio]{accent-color:var(--ac);margin-right:8px}
+button{width:100%;border:0;border-radius:99px;background:var(--ac);color:#fff;font-size:17px;font-weight:700;padding:14px;margin-top:8px;cursor:pointer}
+button.s{background:var(--ac2);color:#33291f}
+#bar{height:8px;background:var(--bd);border-radius:9px;margin:12px 0 16px;overflow:hidden}
+#bar i{display:block;height:100%;width:0;background:var(--ac);transition:width .3s}
+.em{font-size:72px}
+.box{background:var(--card);border:2px solid var(--bd);border-radius:18px;padding:14px;margin:14px 0;text-align:left}
+.box li{margin:6px 0}
+textarea{width:100%;height:90px;border:2px solid var(--bd);border-radius:12px;padding:10px;background:var(--card);color:var(--tx);font-size:14px}
+code{display:block;word-break:break-all;background:var(--card);border:2px dashed var(--bd);border-radius:12px;padding:8px;font-size:13px}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="w">
+<div id="app"></div>
+</div>
+<script>
+// axes: 0=インドア(+)/アウトドア(-) 1=モノ(+)/体験(-) 2=実用(+)/ときめき(-) 3=日常UP(+)/非日常(-)
+var V=[2,0,-2];
+var Q1=[
+[0,"理想の休日は？","家でごろごろ・まったり","どっちも好き","とにかく外に出たい"],
+[0,"友達と遊ぶなら？","家飲み・ゲーム","その時の気分","お出かけ・アクティブ"],
+[1,"誕生日で記憶に残るのは？","形に残るもの","どっちも","体験・思い出"],
+[1,"旅行先でテンション上がるのは？","お土産・買い物","半々","景色やご当地体験"],
+[2,"買い物で重視するのは？","使いやすさ・機能","バランス","見た目・ワクワク感"],
+[2,"グッとくるのは？","地味に役立つもの","どっちも","持ってるだけで上がるもの"],
+[3,"自分で買うなら？","毎日使うものは良いものを","特にこだわらない","贅沢品はたまにご褒美で"],
+[3,"もらって嬉しいのは？","普段の生活が快適になる","どっちも","非日常のご褒美感"]];
+var SH=[
+["プレゼントの使い方は？","毎日使い倒したい","時々の特別な日に","飾る・眺める"],
+["サプライズ度は？","欲しいもの確実がいい","予想外でうれしい","どっちでも"],
+["見た目の好みは？","シンプル・ミニマル","遊び心・個性","高級感・渋め"],
+["消えもの（食・体験）は？","全然OK","残るものがいい","どっちも好き"]];
+var G=[
+{n:"ガジェット探検家",e:"🎧",v:[1,1,1,1],c:"新しい便利、見つけたら試したい！",i:["ワイヤレスイヤホン上位モデル（AirPods Pro / Sony WF-1000XM系）","スマートウォッチ（Apple Watch / Garmin）","高音質ポータブルスピーカー（Bose / Marshall）"],
+q:[["Apple製品は？","Apple派","Android・こだわらない","メーカーの好みあり"],["よく使う場面は？","通勤・移動中","家で","仕事・勉強"],["音楽や動画は？","よく聴く・観る","たまに","あんまり"],["新しいものは？","すぐ試す","評判を見てから","今あるもので十分"]]},
+{n:"おしゃれ小物マスター",e:"⌚",v:[-1,1,-1,-1],c:"身につけるもので気分を上げたい！",i:["きれいめ腕時計（Daniel Wellington / SEIKO）","上質な革財布・名刺入れ・キーケース","フレグランス（ジョーマローン等）やアクセサリー"],
+q:[["普段の服は？","きれいめ","カジュアル・ストリート","決まってない"],["気になる持ち物は？","時計","財布・カバン","香り・アクセ"],["好きな色は？","黒・グレー系","茶・ネイビー系","明るい色もOK"],["ブランドは？","こだわり強い","ちょっと気にする","全然気にしない"]]},
+{n:"グルメ＆お酒の達人",e:"🍷",v:[1,-1,-1,-1],c:"おいしい時間こそ最高のぜいたく！",i:["クラフトビール・ウイスキーの飲み比べセット","高級和牛・うなぎなどお取り寄せグルメ","ちょっといいグラス＆おつまみセット"],
+q:[["お酒は？","よく飲む","たまに","飲まない"],["好きな味は？","肉・がっつり","魚・和","甘いもの"],["食べるのは？","家でゆっくり","外食で","作るのも好き"],["食の冒険は？","珍しいもの好き","定番が好き","特にこだわりなし"]]},
+{n:"思い出コレクター",e:"🎢",v:[-1,-1,-1,-1],c:"モノより一緒に過ごす時間が宝物！",i:["温泉旅館・記念日向け宿泊ギフト","ライブ・スポーツ観戦チケット","ふたりで体験（気球・クルーズ・ディナー）"],
+q:[["誘われたいのは？","旅行・温泉","ライブ・観戦","食事・アクティビティ"],["日程は？","近場で気軽に","泊まりでしっかり","日帰り"],["ペースは？","のんびり","アクティブ","気分で"],["初めての体験は？","やってみたい","どっちでも","慣れた方が安心"]]},
+{n:"趣味にこだわる職人",e:"🏕️",v:[-1,1,1,1],c:"好きな道具は妥協したくない！",i:["キャンプ道具（ランタン・焚き火台・チェア）","スポーツ・アウトドアの高機能ギア","カメラ周辺アイテム・レンズ"],
+q:[["熱中してるのは？","キャンプ・アウトドア","スポーツ・運動","写真・ゲームなど"],["道具選びは？","機能重視","デザイン重視","コスパ重視"],["道具は？","揃えたいものがある","買い足しOK","だいたい揃ってる"],["誰と楽しむ？","ひとりで","友達と","わたしと"]]},
+{n:"のんびり快適マイスター",e:"🛋️",v:[1,1,1,-1],c:"おうちを極上の居心地にしたい！",i:["上質なパジャマ・ルームウェア","マッサージガン・ヘッドスパ家電","コーヒーメーカー・お気に入りのチェア"],
+q:[["疲れた時は？","お風呂・マッサージ","とにかく寝る","好きなものを食べる"],["睡眠は？","こだわる","ふつう","浅い方"],["部屋は？","整頓ミニマル","好きなものに囲まれる","気にしてない"],["癒されるのは？","香りや音","手触り","景色・間接照明"]]}];
+var app=document.getElementById("app"),A1=[],A2=[],GI=0;
+function sc(a){var s=[0,0,0,0];Q1.forEach(function(q,i){s[q[0]]+=V[a[i]]});return s}
+function rank(a){var s=sc(a);return G.map(function(g,i){return[i,g.v.reduce(function(t,x,k){return t+x*s[k]},0)]}).sort(function(x,y){return y[1]-x[1]})}
+function form(qs,off,title,lead,btn,done){
+ var h='<h1>'+title+'</h1><p class="c sub">'+lead+'</p><div id="bar"><i></i></div>';
+ qs.forEach(function(q,i){var s=q.length>4?1:0;
+  h+='<div class="q"><h2><span>Q'+(i+1+off)+'</span>'+q[s]+'</h2>';
+  for(var k=0;k<3;k++)h+='<label><input type="radio" name="q'+i+'" value="'+k+'">'+q[s+1+k]+'</label>';
+  h+='</div>'});
+ h+='<button id="go">'+btn+'</button><p id="warn" class="c sub"></p>';
+ app.innerHTML=h;window.scrollTo(0,0);
+ function upd(){var n=app.querySelectorAll("input:checked").length;app.querySelector("#bar i").style.width=(n/qs.length*100)+"%";return n}
+ app.onchange=upd;
+ document.getElementById("go").onclick=function(){
+  if(upd()<qs.length){document.getElementById("warn").textContent="まだ答えてない質問があるよ！";return}
+  done(qs.map(function(q,i){return+app.querySelector('input[name="q'+i+'"]:checked').value}))}}
+function stage1(){form(Q1,0,"🎁 プレゼント診断","直感でポチポチ答えてね！まずは8問","つぎへ ➡️",function(a){A1=a;GI=rank(a)[0][0];mid()})}
+function mid(){app.onchange=null;app.innerHTML='<div class="c"><div class="em">🔍</div><h1>前半おつかれさま！</h1><p>ここからは深掘りタイム。<br>あと8問だけ答えてね</p><button id="nx">深掘りスタート ✨</button></div>';
+ document.getElementById("nx").onclick=stage2}
+function stage2(){form(SH.concat(G[GI].q),8,"🔍 深掘りタイム","もうちょっとだけ！ラスト8問","回答を完了する 🎉",function(a){A2=a;thanks()})}
+function code(){return A1.concat(A2).join("")}
+function thanks(){app.onchange=null;
+ var t="🎁誕生日診断の回答コードだよ→ "+code();
+ app.innerHTML='<div class="c"><div class="em">🎉</div><h1>回答ありがとう〜！</h1><p>おかげでいい感じに決まりそう！<br>結果は当日までないしょだよ〜🤫</p><div class="box c">最後に、このボタンでわたしに回答を送ってね👇<button id="sh">💌 回答を送る</button><p id="msg" class="sub"></p></div></div>';
+ document.getElementById("sh").onclick=function(){
+  var m=document.getElementById("msg");
+  if(navigator.share){navigator.share({text:t}).catch(function(){})}
+  else if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){m.textContent="コピーしたよ！わたしに貼り付けて送ってね"}).catch(function(){m.textContent=t})}
+  else m.textContent=t}}
+function her(){app.onchange=null;
+ app.innerHTML='<h1>🕵️ 結果ルーム（わたし用）</h1><p class="c sub">届いたコードを貼ってね</p><textarea id="cd" placeholder="回答コードを貼り付け"></textarea><button id="ok">結果を見る 🔓</button><p id="er" class="c sub"></p><div id="out"></div>';
+ document.getElementById("ok").onclick=function(){
+  var d=(document.getElementById("cd").value.match(/\d{16}/)||[""])[0];
+  if(!d){document.getElementById("er").textContent="16桁のコードが見つからないよ";return}
+  var a=d.split("").map(Number),a1=a.slice(0,8),a2=a.slice(8),r=rank(a1),t=G[r[0][0]],u=G[r[1][0]],qs=SH.concat(t.q);
+  var ans=qs.map(function(q,i){var s=q.length>4?1:0;return"<li><span class='sub'>"+q[s]+"</span><br><b>"+q[s+1+a2[i]]+"</b></li>"}).join("");
+  document.getElementById("out").innerHTML='<div class="c"><div class="em">'+t.e+'</div><div class="sub">彼のジャンルは…</div><h1>'+t.n+'</h1><p>'+t.c+'</p></div>'
+  +'<div class="box"><b>💡 プレゼントアイデア</b><ul>'+t.i.map(function(x){return"<li>"+x+"</li>"}).join("")+'</ul></div>'
+  +'<div class="box"><b>📝 深掘り回答（ここから絞ろう）</b><ul>'+ans+'</ul></div>'
+  +'<div class="box"><b>🥈 サブ候補：'+u.e+' '+u.n+'</b><ul>'+u.i.slice(0,2).map(function(x){return"<li>"+x+"</li>"}).join("")+'</ul></div>'}}
+function route(){if(location.hash==="#her")her();else stage1()}
+window.addEventListener("hashchange",route);route();
+</script>
+</body>
+</html>
